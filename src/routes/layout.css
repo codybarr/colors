@@ -31,6 +31,7 @@ input {
 	justify-content: center;
 	min-height: 100vh;
 	padding: 1.5rem;
+	color: var(--foreground-color);
 	background: linear-gradient(
 		180deg,
 		var(--selected-color) 0 50%,
@@ -75,7 +76,7 @@ input {
 .color-value input {
 	width: min(100%, 22rem);
 	padding: 0.45rem 0;
-	color: #fff;
+	color: var(--foreground-color);
 	background: transparent;
 	border: 0;
 	border-bottom: 1px solid currentcolor;
@@ -83,7 +84,7 @@ input {
 }
 
 .color-value input::placeholder {
-	color: color-mix(in srgb, #fff 65%, transparent);
+	color: color-mix(in srgb, var(--foreground-color) 65%, transparent);
 }
 
 .match {
@@ -106,8 +107,7 @@ input {
 .match-status,
 .match button,
 .representations > span {
-	color: #fff;
-	mix-blend-mode: difference;
+	color: var(--foreground-color);
 }
 
 .eyebrow {
@@ -162,7 +162,7 @@ input {
 }
 
 :focus-visible {
-	outline: 3px solid #fff;
+	outline: 3px solid var(--foreground-color);
 	outline-offset: 4px;
 }
 

@@ -92,7 +92,16 @@ export function parseCssColor(value: string): ParsedColor | null {
 	return null;
 }
 
-function requireParsedHex(value: string): ParsedColor {
+export function foregroundForColor(value: string): "#000" | "#fff" {
+	const { red, green, blue } = requireParsedHex(value);
+	const luminance =
+		0.2126 * srgbToLinear(red) +
+		0.7152 * srgbToLinear(green) +
+		0.0722 * srgbToLinear(blue);
+	return luminance > 0.179 ? "#000" : "#fff";
+}
+
+function requireParsedHex(value: string) {
 	const color = parseHex(value);
 	if (!color)
 		throw new TypeError(`Expected a #RRGGBB color, received ${value}`);

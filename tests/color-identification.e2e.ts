@@ -50,6 +50,25 @@ test("updates the selected color and match from RGB and OKLCH text input", async
 	await expect(page.getByText("#FF0000", { exact: true })).toBeVisible();
 });
 
+test("uses a black foreground for a light selected color", async ({ page }) => {
+	await page.goto("/");
+	const selectedColorValue = page.getByLabel("Selected color value");
+	await selectedColorValue.fill("#FFFFFF");
+
+	await expect(selectedColorValue).toHaveCSS("color", "rgb(0, 0, 0)");
+	await expect(page.getByText("#FFFFFF", { exact: true })).toHaveCSS(
+		"color",
+		"rgb(0, 0, 0)",
+	);
+
+	await selectedColorValue.fill("#000000");
+	await expect(selectedColorValue).toHaveCSS("color", "rgb(255, 255, 255)");
+	await expect(page.getByText("#000000", { exact: true })).toHaveCSS(
+		"color",
+		"rgb(255, 255, 255)",
+	);
+});
+
 test("switches the selected color to the named-color match and announces it", async ({
 	page,
 }) => {

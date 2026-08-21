@@ -4,6 +4,7 @@ import { onMount } from "svelte";
 import { namedColorCatalog } from "$lib/color/catalog";
 import {
 	findNamedColorMatch,
+	foregroundForColor,
 	formatOklch,
 	formatRgb,
 	parseHex,
@@ -21,6 +22,7 @@ let namedColorMatch = $derived(
 let isExactMatch = $derived(namedColorMatch.hex === selectedColor);
 let selectedColorRgb = $derived(formatRgb(selectedColor));
 let selectedColorOklch = $derived(formatOklch(selectedColor));
+let foregroundColor = $derived(foregroundForColor(selectedColor));
 
 onMount(() => {
 	isHydrated = true;
@@ -48,7 +50,7 @@ function switchToMatch() {
 	class:exact-match={isExactMatch}
 	class="color-identification"
 	data-hydrated={isHydrated}
-	style={`--selected-color: ${selectedColor}; --matched-color: ${namedColorMatch.hex};`}
+	style={`--selected-color: ${selectedColor}; --matched-color: ${namedColorMatch.hex}; --foreground-color: ${foregroundColor};`}
 >
 	<ColorPicker value={selectedColor} oninput={selectColor} />
 	<NamedColorMatch
