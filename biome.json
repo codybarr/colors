@@ -30,5 +30,17 @@
 				"organizeImports": "on"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["src/lib/color/catalog.ts"],
+			"formatter": { "enabled": false },
+			"linter": { "enabled": false },
+			"assist": { "enabled": false }
+		},
+		{
+			"includes": ["**/*.svelte"],
+			"linter": { "enabled": false }
+		}
+	]
 }

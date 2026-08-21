@@ -25,3 +25,5 @@ vite.config.ts.timestamp-*
 # Playwright
 .playwright-cli/
 
+# Playwright
+test-results
