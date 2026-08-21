@@ -133,6 +133,10 @@ input {
 	border-bottom: 1px solid currentcolor;
 }
 
+.match-button-placeholder {
+	visibility: hidden;
+}
+
 .representations {
 	display: flex;
 	flex-wrap: wrap;

@@ -16,7 +16,12 @@ let {
 	<p class="eyebrow" id="named-match-heading">Named-color match</p>
 	<p class="match-name">{name}</p>
 	<p class="match-status">{isExactMatch ? 'Exact named-color match' : `Matched hex: ${hex}`}</p>
-	{#if !isExactMatch}
-		<button type="button" onclick={onswitch}>Switch to match</button>
-	{/if}
+	<button
+		type="button"
+		onclick={onswitch}
+		disabled={isExactMatch}
+		class:match-button-placeholder={isExactMatch}
+	>
+		Switch to match
+	</button>
 </section>

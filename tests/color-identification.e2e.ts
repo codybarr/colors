@@ -93,6 +93,18 @@ test("switches the selected color to the named-color match and announces it", as
 	await expect(page.getByText("Exact named-color match")).toBeVisible();
 });
 
+test("keeps the match area stable when switching to an exact named-color match", async ({
+	page,
+}) => {
+	await page.goto("/");
+	const match = page.locator(".match");
+	const unmatchedHeight = await match.evaluate((element) => element.clientHeight);
+
+	await page.getByRole("button", { name: "Switch to match" }).click();
+	await expect(page.getByText("Exact named-color match")).toBeVisible();
+	await expect(match).toHaveJSProperty("clientHeight", unmatchedHeight);
+});
+
 test("retains the stable initial color and explains the JavaScript requirement without JavaScript", async ({
 	browser,
 }) => {
