@@ -63,6 +63,7 @@ function switchToMatch() {
 		hex={selectedColor}
 		rgb={selectedColorRgb}
 		oklch={selectedColorOklch}
+		oninput={selectColor}
 	/>
 	<p class="match-announcement" aria-atomic="true" aria-live="polite">
 		Named-color match: {namedColorMatch.name}, {namedColorMatch.hex}.

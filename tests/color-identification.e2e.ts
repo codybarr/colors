@@ -8,8 +8,10 @@ test("shows the deterministic selected color and its named-color match", async (
 	await expect(page.getByLabel("Selected color", { exact: true })).toHaveValue(
 		"#2563eb",
 	);
-	await expect(page.getByText("#2563EB", { exact: true })).toBeVisible();
-	await expect(page.getByText("rgb(37 99 235)", { exact: true })).toBeVisible();
+	await expect(page.getByLabel("Hex color value")).toHaveValue("#2563EB");
+	await expect(page.getByLabel("RGB color value")).toHaveValue(
+		"rgb(37 99 235)",
+	);
 	await expect(page.getByText("Epic Blue", { exact: true })).toBeVisible();
 	await expect(page.locator("main")).not.toHaveClass(/exact-match/);
 });
@@ -21,33 +23,48 @@ test("updates the selected color representations from the native picker", async 
 	await expect(page.locator('main[data-hydrated="true"]')).toBeVisible();
 	await page.getByLabel("Selected color", { exact: true }).fill("#ff0000");
 
-	await expect(page.getByText("#FF0000", { exact: true })).toBeVisible();
-	await expect(page.getByText("rgb(255 0 0)", { exact: true })).toBeVisible();
+	await expect(page.getByLabel("Hex color value")).toHaveValue("#FF0000");
+	await expect(page.getByLabel("RGB color value")).toHaveValue(
+		"rgb(255 0 0)",
+	);
 	await expect(page.locator("main")).toHaveAttribute(
 		"style",
 		/--selected-color: #FF0000/,
 	);
 });
 
-test("updates the selected color and match from RGB and OKLCH text input", async ({
+test("updates the selected color and match from RGB and OKLCH representation inputs", async ({
 	page,
 }) => {
 	await page.goto("/");
-	const selectedColorValue = page.getByLabel("Selected color value");
-	await selectedColorValue.fill("rgb(36 100 235)");
+	const rgb = page.getByLabel("RGB color value");
+	await rgb.fill("rgb(36 100 235)");
 
-	await expect(page.getByText("#2464EB", { exact: true })).toBeVisible();
-	await expect(
-		page.getByText("rgb(36 100 235)", { exact: true }),
-	).toBeVisible();
+	await expect(page.getByLabel("Hex color value")).toHaveValue("#2464EB");
+	await expect(rgb).toHaveValue("rgb(36 100 235)");
 	await expect(page.locator("main")).not.toHaveClass(/exact-match/);
 	await expect(page.locator("main")).toHaveCSS(
 		"background-image",
 		/linear-gradient\(/,
 	);
 
-	await selectedColorValue.fill("oklch(62.8% 0.2577 29.23)");
-	await expect(page.getByText("#FF0000", { exact: true })).toBeVisible();
+	await page
+		.getByLabel("OKLCH color value")
+		.fill("oklch(62.8% 0.2577 29.23)");
+	await expect(page.getByLabel("Hex color value")).toHaveValue("#FF0000");
+});
+
+test("copies a color representation", async ({ page }) => {
+	await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+	await page.goto("/");
+	await page.getByRole("button", { name: "Copy hex value" }).click();
+
+	await expect(page.locator(".copy-announcement")).toHaveText(
+		"Hex value copied.",
+	);
+	await expect(page.evaluate(() => navigator.clipboard.readText())).resolves.toBe(
+		"#2563EB",
+	);
 });
 
 test("uses a black foreground for a light selected color", async ({ page }) => {
@@ -56,14 +73,14 @@ test("uses a black foreground for a light selected color", async ({ page }) => {
 	await selectedColorValue.fill("#FFFFFF");
 
 	await expect(selectedColorValue).toHaveCSS("color", "rgb(0, 0, 0)");
-	await expect(page.getByText("#FFFFFF", { exact: true })).toHaveCSS(
+	await expect(page.getByLabel("Hex color value")).toHaveCSS(
 		"color",
 		"rgb(0, 0, 0)",
 	);
 
 	await selectedColorValue.fill("#000000");
 	await expect(selectedColorValue).toHaveCSS("color", "rgb(255, 255, 255)");
-	await expect(page.getByText("#000000", { exact: true })).toHaveCSS(
+	await expect(page.getByLabel("Hex color value")).toHaveCSS(
 		"color",
 		"rgb(255, 255, 255)",
 	);
@@ -84,7 +101,7 @@ test("switches the selected color to the named-color match and announces it", as
 	);
 	await expect(page.getByText("Exact named-color match")).toBeVisible();
 	await expect(page.locator("main")).toHaveClass(/exact-match/);
-	await expect(page.locator('[aria-live="polite"]')).toContainText(
+	await expect(page.locator(".match-announcement")).toContainText(
 		"Epic Blue, #0066EE",
 	);
 
@@ -118,6 +135,6 @@ test("retains the stable initial color and explains the JavaScript requirement w
 	expect(noScriptMarkup).toContain(
 		"Interactive color identification requires JavaScript.",
 	);
-	await expect(page.getByText("#2563EB", { exact: true })).toBeVisible();
+	await expect(page.getByLabel("Hex color value")).toHaveValue("#2563EB");
 	await context.close();
 });

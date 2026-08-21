@@ -106,11 +106,13 @@ input {
 
 .picker label,
 .color-value label,
+.representation label,
 .eyebrow,
 .match-name,
 .match-status,
 .match button,
-.representations > span {
+.representation-control input,
+.representation-control button {
 	color: var(--foreground-color);
 }
 
@@ -145,11 +147,59 @@ input {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 0 1rem;
+	gap: 1rem;
 	margin-top: 2.5rem;
 }
 
-.match-announcement {
+.representation {
+	display: grid;
+	gap: 0.25rem;
+}
+
+.representation label {
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.representation-control {
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid currentcolor;
+}
+
+.representation-control input {
+	min-width: 0;
+	padding: 0.25rem 0;
+	font: inherit;
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+}
+
+.representation--hex input {
+	width: 7ch;
+}
+
+.representation--rgb input {
+	width: 16ch;
+}
+
+.representation--oklch input {
+	width: 28ch;
+}
+
+.representation-control button {
+	display: grid;
+	padding: 0.2rem 0 0.2rem 0.4rem;
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+}
+
+.match-announcement,
+.copy-announcement {
 	position: absolute;
 	width: 1px;
 	height: 1px;
