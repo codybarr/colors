@@ -5,7 +5,9 @@ test("shows the deterministic selected color and its named-color match", async (
 }) => {
 	await page.goto("/");
 
-	await expect(page.getByLabel("Selected color")).toHaveValue("#2563eb");
+	await expect(page.getByLabel("Selected color", { exact: true })).toHaveValue(
+		"#2563eb",
+	);
 	await expect(page.getByText("#2563EB", { exact: true })).toBeVisible();
 	await expect(page.getByText("rgb(37 99 235)", { exact: true })).toBeVisible();
 	await expect(page.getByText("Epic Blue", { exact: true })).toBeVisible();
@@ -27,6 +29,27 @@ test("updates the selected color representations from the native picker", async 
 	);
 });
 
+test("updates the selected color and match from RGB and OKLCH text input", async ({
+	page,
+}) => {
+	await page.goto("/");
+	const selectedColorValue = page.getByLabel("Selected color value");
+	await selectedColorValue.fill("rgb(36 100 235)");
+
+	await expect(page.getByText("#2464EB", { exact: true })).toBeVisible();
+	await expect(
+		page.getByText("rgb(36 100 235)", { exact: true }),
+	).toBeVisible();
+	await expect(page.locator("main")).not.toHaveClass(/exact-match/);
+	await expect(page.locator("main")).toHaveCSS(
+		"background-image",
+		/linear-gradient\(/,
+	);
+
+	await selectedColorValue.fill("oklch(62.8% 0.2577 29.23)");
+	await expect(page.getByText("#FF0000", { exact: true })).toBeVisible();
+});
+
 test("switches the selected color to the named-color match and announces it", async ({
 	page,
 }) => {
@@ -36,13 +59,19 @@ test("switches the selected color to the named-color match and announces it", as
 		page.getByRole("button", { name: "Switch to match" }),
 	).toBeFocused();
 
-	await page.getByRole("button", { name: "Switch to match" }).click();
-	await expect(page.getByLabel("Selected color")).toHaveValue("#0066ee");
+	await page.getByRole("button", { name: "Switch to match" }).press("Enter");
+	await expect(page.getByLabel("Selected color", { exact: true })).toHaveValue(
+		"#0066ee",
+	);
 	await expect(page.getByText("Exact named-color match")).toBeVisible();
 	await expect(page.locator("main")).toHaveClass(/exact-match/);
 	await expect(page.locator('[aria-live="polite"]')).toContainText(
 		"Epic Blue, #0066EE",
 	);
+
+	await page.goto("/");
+	await page.getByRole("button", { name: "Switch to match" }).click();
+	await expect(page.getByText("Exact named-color match")).toBeVisible();
 });
 
 test("retains the stable initial color and explains the JavaScript requirement without JavaScript", async ({

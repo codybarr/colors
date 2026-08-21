@@ -32,7 +32,7 @@ input {
 	min-height: 100vh;
 	padding: 1.5rem;
 	background: linear-gradient(
-		90deg,
+		180deg,
 		var(--selected-color) 0 50%,
 		var(--matched-color) 50% 100%
 	);
@@ -42,23 +42,48 @@ input {
 	background: var(--selected-color);
 }
 
-.picker-label {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.75rem;
+.picker-group {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: end;
+	gap: 1rem;
+}
+
+.picker,
+.color-value {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.picker label,
+.color-value label {
 	font-size: 0.75rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
 
-.picker-label input {
+.picker input[type="color"] {
 	width: 2.5rem;
 	height: 2.5rem;
 	padding: 0;
 	cursor: pointer;
 	background: transparent;
 	border: 0;
+}
+
+.color-value input {
+	width: min(100%, 22rem);
+	padding: 0.45rem 0;
+	color: #fff;
+	background: transparent;
+	border: 0;
+	border-bottom: 1px solid currentcolor;
+	border-radius: 0;
+}
+
+.color-value input::placeholder {
+	color: color-mix(in srgb, #fff 65%, transparent);
 }
 
 .match {
@@ -74,7 +99,8 @@ input {
 	letter-spacing: 0.04em;
 }
 
-.picker-label > span,
+.picker label,
+.color-value label,
 .eyebrow,
 .match-name,
 .match-status,
@@ -150,5 +176,4 @@ input {
 	.color-identification {
 		padding: 0.75rem;
 	}
-
 }

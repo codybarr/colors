@@ -27,6 +27,71 @@ export function parseHex(value: string): ParsedColor | null {
 	};
 }
 
+function toHexChannel(value: number): string {
+	return Math.round(Math.min(1, Math.max(0, value)) * 255)
+		.toString(16)
+		.padStart(2, "0");
+}
+
+function linearToSrgb(channel: number): number {
+	return channel <= 0.0031308
+		? 12.92 * channel
+		: 1.055 * channel ** (1 / 2.4) - 0.055;
+}
+
+function oklabToHex(lightness: number, a: number, b: number): string {
+	const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+	const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+	const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
+	const red = linearToSrgb(
+		4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+	);
+	const green = linearToSrgb(
+		-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+	);
+	const blue = linearToSrgb(
+		-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+	);
+	return `#${toHexChannel(red)}${toHexChannel(green)}${toHexChannel(blue)}`.toUpperCase();
+}
+
+/** Parses the opaque CSS sRGB formats accepted by the selected-color text field. */
+export function parseCssColor(value: string): ParsedColor | null {
+	const hex = parseHex(value);
+	if (hex) return hex;
+
+	const rgb = value.match(
+		/^rgb\(\s*(\d{1,3})\s*(?:,|\s)\s*(\d{1,3})\s*(?:,|\s)\s*(\d{1,3})\s*\)$/i,
+	);
+	if (rgb) {
+		const channels = rgb.slice(1).map(Number);
+		if (channels.every((channel) => channel <= 255)) {
+			return parseHex(
+				`#${channels.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`,
+			);
+		}
+	}
+
+	const oklch = value.match(
+		/^oklch\(\s*([\d.]+)%\s+([\d.]+)\s+(-?[\d.]+)(?:deg)?\s*\)$/i,
+	);
+	if (oklch) {
+		const [lightness, chroma, hue] = oklch.slice(1).map(Number);
+		if (lightness <= 100 && chroma >= 0) {
+			const radians = (hue * Math.PI) / 180;
+			return parseHex(
+				oklabToHex(
+					lightness / 100,
+					chroma * Math.cos(radians),
+					chroma * Math.sin(radians),
+				),
+			);
+		}
+	}
+
+	return null;
+}
+
 function requireParsedHex(value: string): ParsedColor {
 	const color = parseHex(value);
 	if (!color)
