@@ -68,12 +68,23 @@ input {
 }
 
 .picker input[type="color"] {
-	width: 2.5rem;
-	height: 2.5rem;
-	padding: 0;
+	width: 2.75rem;
+	height: 2.75rem;
+	padding: 0.18rem;
 	cursor: pointer;
-	background: transparent;
+	background: var(--foreground-color);
+	border: 2px solid var(--foreground-color);
+	border-radius: 0.35rem;
+}
+
+.picker input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+.picker input[type="color"]::-webkit-color-swatch,
+.picker input[type="color"]::-moz-color-swatch {
 	border: 0;
+	border-radius: 0.1rem;
 }
 
 .color-value input {

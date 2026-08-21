@@ -12,6 +12,10 @@ test("shows the deterministic selected color and its named-color match", async (
 	await expect(page.getByLabel("RGB color value")).toHaveValue(
 		"rgb(37 99 235)",
 	);
+	await expect(page.getByLabel("Selected color", { exact: true })).toHaveCSS(
+		"border-top-width",
+		"2px",
+	);
 	await expect(page.getByText("Epic Blue", { exact: true })).toBeVisible();
 	await expect(page.locator("main")).not.toHaveClass(/exact-match/);
 });
