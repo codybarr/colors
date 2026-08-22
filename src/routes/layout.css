@@ -2,118 +2,120 @@
 @import "tailwindcss";
 
 :root {
-	font-family:
-		ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
-		monospace;
-	color: #fff;
-	background: #2563eb;
-	font-synthesis: none;
+    font-family:
+        ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+    color: #fff;
+    background: #2563eb;
+    font-synthesis: none;
 }
 
 * {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-	min-width: 20rem;
-	min-height: 100vh;
-	margin: 0;
+    min-width: 20rem;
+    min-height: 100vh;
+    margin: 0;
 }
 
 button,
 input {
-	font: inherit;
+    font: inherit;
 }
 
 .color-identification {
-	display: grid;
-	grid-template-columns: min(100%, 42rem);
-	align-content: center;
-	justify-content: center;
-	min-height: 100vh;
-	padding: 1.5rem;
-	color: var(--foreground-color);
-	font-family: "DM Mono", ui-monospace, monospace;
-	background-color: var(--selected-color);
-	background-image: linear-gradient(
-		180deg,
-		var(--selected-color) 0 50%,
-		var(--matched-color) 50% 100%
-	);
+    display: grid;
+    grid-template-columns: min(100%, 42rem);
+    align-content: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+    color: var(--foreground-color);
+    font-family: "DM Mono", ui-monospace, monospace;
+    background-color: var(--selected-color);
+    background-image: linear-gradient(
+        180deg,
+        var(--selected-color) 0 50%,
+        var(--matched-color) 50% 100%
+    );
 }
 
 .color-identification.exact-match {
-	background-image: none;
+    background-image: none;
 }
 
 .picker-group {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: end;
-	justify-content: center;
-	gap: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .picker,
 .color-value {
-	display: grid;
-	gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .picker label,
 .color-value label {
-	font-size: 0.75rem;
-	font-weight: 700;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .picker input[type="color"] {
-	width: 2.75rem;
-	height: 2.75rem;
-	padding: 0.18rem;
-	cursor: pointer;
-	background: var(--foreground-color);
-	border: 2px solid var(--foreground-color);
-	border-radius: 0.35rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.18rem;
+    cursor: pointer;
+    background: var(--foreground-color);
+    border: 2px solid var(--foreground-color);
+    border-radius: 0.35rem;
 }
 
 .picker input[type="color"]::-webkit-color-swatch-wrapper {
-	padding: 0;
+    padding: 0;
 }
 
 .picker input[type="color"]::-webkit-color-swatch,
 .picker input[type="color"]::-moz-color-swatch {
-	border: 0;
-	border-radius: 0.1rem;
+    border: 0;
+    border-radius: 0.1rem;
 }
 
 .color-value input {
-	width: min(100%, 22rem);
-	padding: 0.45rem 0;
-	color: var(--foreground-color);
-	background: transparent;
-	border: 0;
-	border-bottom: 1px solid currentcolor;
-	border-radius: 0;
+    width: min(100%, 22rem);
+    padding: 0.45rem 0;
+    color: var(--foreground-color);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid currentcolor;
+    border-radius: 0;
 }
 
 .color-value input::placeholder {
-	color: color-mix(in srgb, var(--foreground-color) 65%, transparent);
+    color: color-mix(in srgb, var(--foreground-color) 65%, transparent);
 }
 
 .match {
-	margin-top: 2.5rem;
-	text-align: center;
+    margin-top: 2.5rem;
+    text-align: center;
 }
 
 .eyebrow,
 .match-status,
 .representations {
-	margin: 0;
-	font-size: clamp(0.7rem, 1.8vw, 0.82rem);
-	line-height: 1.6;
-	letter-spacing: 0.04em;
+    margin: 0;
+    font-size: clamp(0.7rem, 1.8vw, 0.82rem);
+    line-height: 1.6;
+    letter-spacing: 0.04em;
 }
 
 .picker label,
@@ -125,126 +127,126 @@ input {
 .match button,
 .representation-control input,
 .representation-control button {
-	color: var(--foreground-color);
+    color: var(--foreground-color);
 }
 
 .eyebrow {
-	text-transform: uppercase;
+    text-transform: uppercase;
 }
 
 .match-name {
-	margin: 0.45rem 0;
-	font-size: clamp(1.8rem, 7vw, 4.5rem);
-	font-weight: 700;
-	line-height: 0.96;
-	letter-spacing: -0.08em;
-	word-break: break-word;
+    margin: 0.45rem 0;
+    font-size: clamp(1.8rem, 7vw, 4.5rem);
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.08em;
+    word-break: break-word;
 }
 
 .match button {
-	margin-top: 1.5rem;
-	padding: 0;
-	color: inherit;
-	cursor: pointer;
-	background: none;
-	border: 0;
-	border-bottom: 1px solid currentcolor;
+    margin-top: 1.5rem;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid currentcolor;
 }
 
 .match-button-placeholder {
-	visibility: hidden;
+    visibility: hidden;
 }
 
 .representations {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 1rem;
-	margin-top: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
 }
 
 .representation {
-	display: grid;
-	gap: 0.25rem;
+    display: grid;
+    gap: 0.25rem;
 }
 
 .representation label {
-	font-size: 0.7rem;
-	font-weight: 700;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .representation-control {
-	display: flex;
-	align-items: center;
-	border-bottom: 1px solid currentcolor;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid currentcolor;
 }
 
 .representation-control input {
-	min-width: 0;
-	padding: 0.25rem 0;
-	font: inherit;
-	background: transparent;
-	border: 0;
-	border-radius: 0;
+    min-width: 0;
+    padding: 0.25rem 0;
+    font: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
 }
 
 .representation--hex input {
-	width: 7ch;
+    width: 7ch;
 }
 
 .representation--rgb input {
-	width: 16ch;
+    width: 16ch;
 }
 
 .representation--oklch input {
-	width: 28ch;
+    width: 28ch;
 }
 
 .representation-control button {
-	display: grid;
-	padding: 0.2rem 0 0.2rem 0.4rem;
-	cursor: pointer;
-	background: transparent;
-	border: 0;
+    display: grid;
+    padding: 0.2rem 0 0.2rem 0.4rem;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
 }
 
 .match-announcement,
 .copy-announcement {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-	clip: rect(0 0 0 0);
-	white-space: nowrap;
-	clip-path: inset(50%);
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
 }
 
 .no-script-message {
-	position: fixed;
-	bottom: 1rem;
-	left: 1rem;
-	max-width: 30rem;
-	padding: 0.75rem 1rem;
-	margin: 0;
-	color: #fff;
-	background: #000;
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    max-width: 30rem;
+    padding: 0.75rem 1rem;
+    margin: 0;
+    color: #fff;
+    background: #000;
 }
 
 :focus-visible {
-	outline: 3px solid var(--foreground-color);
-	outline-offset: 4px;
+    outline: 3px solid var(--foreground-color);
+    outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	.color-identification {
-		transition: background-color 120ms linear;
-	}
+    .color-identification {
+        transition: background-color 120ms linear;
+    }
 }
 
 @media (max-width: 32rem) {
-	.color-identification {
-		padding: 0.75rem;
-	}
+    .color-identification {
+        padding: 0.75rem;
+    }
 }
