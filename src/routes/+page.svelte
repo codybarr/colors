@@ -1,41 +1,46 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+import { onMount } from "svelte";
 
-  import { namedColorCatalog } from "$lib/color/catalog";
-  import {
-    findNamedColorMatch,
-    foregroundForColor,
-    formatOklch,
-    formatRgb,
-    parseHex,
-  } from "$lib/color/color";
+import { namedColorCatalog } from "$lib/color/catalog";
+import {
+  findNamedColorMatch,
+  foregroundForColor,
+  formatOklch,
+  formatRgb,
+  parseHex,
+} from "$lib/color/color";
 
-  import ColorPicker from "./ColorPicker.svelte";
-  import ColorRepresentations from "./ColorRepresentations.svelte";
-  import NamedColorMatch from "./NamedColorMatch.svelte";
+import ColorPicker from "./ColorPicker.svelte";
+import ColorRepresentations from "./ColorRepresentations.svelte";
+import NamedColorMatch from "./NamedColorMatch.svelte";
 
-  let selectedColor = $state("#2563EB");
-  let isHydrated = $state(false);
-  let namedColorMatch = $derived(
-    findNamedColorMatch(selectedColor, namedColorCatalog),
-  );
-  let isExactMatch = $derived(namedColorMatch.hex === selectedColor);
-  let selectedColorRgb = $derived(formatRgb(selectedColor));
-  let selectedColorOklch = $derived(formatOklch(selectedColor));
-  let foregroundColor = $derived(foregroundForColor(selectedColor));
+let { data } = $props();
 
-  onMount(() => {
-    isHydrated = true;
-  });
+let selectedColorOverride = $state<string | null>(null);
+let selectedColor = $derived(
+  selectedColorOverride ?? data.initialSelectedColor,
+);
+let isHydrated = $state(false);
+let namedColorMatch = $derived(
+  findNamedColorMatch(selectedColor, namedColorCatalog),
+);
+let isExactMatch = $derived(namedColorMatch.hex === selectedColor);
+let selectedColorRgb = $derived(formatRgb(selectedColor));
+let selectedColorOklch = $derived(formatOklch(selectedColor));
+let foregroundColor = $derived(foregroundForColor(selectedColor));
 
-  function selectColor(value: string) {
-    const color = parseHex(value);
-    if (color) selectedColor = color.hex;
-  }
+onMount(() => {
+  isHydrated = true;
+});
 
-  function switchToMatch() {
-    selectedColor = namedColorMatch.hex;
-  }
+function selectColor(value: string) {
+  const color = parseHex(value);
+  if (color) selectedColorOverride = color.hex;
+}
+
+function switchToMatch() {
+  selectedColorOverride = namedColorMatch.hex;
+}
 </script>
 
 <svelte:head>
@@ -72,6 +77,6 @@
 <noscript>
   <p class="fixed bottom-4 left-4 m-0 max-w-120 bg-black px-4 py-3 text-white">
     Interactive color identification requires JavaScript. The initial selected
-    color is #2563EB.
+    color is {selectedColor}.
   </p>
 </noscript>

@@ -1,26 +1,12 @@
 import { expect, test } from "@playwright/test";
 
-test("shows the deterministic selected color and its named-color match", async ({
-  page,
-}) => {
+test("selects a random named color on load", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator('main[data-hydrated="true"]')).toBeVisible();
 
-  await expect(page.getByLabel("Selected color", { exact: true })).toHaveValue(
-    "#2563eb",
-  );
-  await expect(page.getByLabel("Hex color value")).toHaveValue("#2563EB");
-  await expect(page.getByLabel("RGB color value")).toHaveValue(
-    "rgb(37 99 235)",
-  );
-  await expect(page.getByLabel("Selected color", { exact: true })).toHaveCSS(
-    "border-top-width",
-    "2px",
-  );
-  await expect(page.getByText("Epic Blue", { exact: true })).toBeVisible();
-  await expect(page.locator("main")).toHaveCSS(
-    "background-image",
-    /linear-gradient\(/,
-  );
+  const selectedHex = await page.getByLabel("Hex color value").inputValue();
+  expect(selectedHex).toMatch(/^#[0-9A-F]{6}$/);
+  await expect(page.locator("main")).toHaveCSS("background-image", "none");
 });
 
 test("updates the selected color representations from the native picker", async ({
@@ -28,7 +14,7 @@ test("updates the selected color representations from the native picker", async 
 }) => {
   await page.goto("/");
   await expect(page.locator('main[data-hydrated="true"]')).toBeVisible();
-  await page.getByLabel("Selected color", { exact: true }).fill("#ff0000");
+  await page.getByLabel("Hex color value").fill("#ff0000");
 
   await expect(page.getByLabel("Hex color value")).toHaveValue("#FF0000");
   await expect(page.getByLabel("RGB color value")).toHaveValue("rgb(255 0 0)");
@@ -59,6 +45,8 @@ test("updates the selected color and match from RGB and OKLCH representation inp
 test("copies a color representation", async ({ page }) => {
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/");
+  await expect(page.locator('main[data-hydrated="true"]')).toBeVisible();
+  const selectedHex = await page.getByLabel("Hex color value").inputValue();
   await page.getByRole("button", { name: "Copy hex value" }).click();
 
   await expect(page.getByText("Hex value copied.")).toHaveText(
@@ -66,24 +54,22 @@ test("copies a color representation", async ({ page }) => {
   );
   await expect(
     page.evaluate(() => navigator.clipboard.readText()),
-  ).resolves.toBe("#2563EB");
+  ).resolves.toBe(selectedHex);
 });
 
 test("uses a black foreground for a light selected color", async ({ page }) => {
   await page.goto("/");
-  const selectedColorValue = page.getByLabel("Selected color", {
-    exact: true,
-  });
+  const selectedColorValue = page.getByLabel("Hex color value");
   await selectedColorValue.fill("#FFFFFF");
 
-  await expect(selectedColorValue).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(page.locator("main")).toHaveCSS("color", "rgb(0, 0, 0)");
   await expect(page.getByLabel("Hex color value")).toHaveCSS(
     "color",
     "rgb(0, 0, 0)",
   );
 
   await selectedColorValue.fill("#000000");
-  await expect(selectedColorValue).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(page.locator("main")).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(page.getByLabel("Hex color value")).toHaveCSS(
     "color",
     "rgb(255, 255, 255)",
@@ -94,15 +80,14 @@ test("switches the selected color to the named-color match and announces it", as
   page,
 }) => {
   await page.goto("/");
+  await page.getByLabel("Hex color value").fill("#2563EB");
   await page.getByRole("button", { name: "Switch to match" }).focus();
   await expect(
     page.getByRole("button", { name: "Switch to match" }),
   ).toBeFocused();
 
   await page.getByRole("button", { name: "Switch to match" }).press("Enter");
-  await expect(page.getByLabel("Selected color", { exact: true })).toHaveValue(
-    "#0066ee",
-  );
+  await expect(page.getByLabel("Hex color value")).toHaveValue("#0066EE");
   await expect(
     page.getByText("Named-color match", { exact: true }),
   ).toBeVisible();
@@ -112,6 +97,7 @@ test("switches the selected color to the named-color match and announces it", as
   ).toBeVisible();
 
   await page.goto("/");
+  await page.getByLabel("Hex color value").fill("#2563EB");
   await page.getByRole("button", { name: "Switch to match" }).click();
   await expect(
     page.getByText("Named-color match", { exact: true }),
@@ -123,6 +109,7 @@ test("keeps an opaque selected-color background during the match switch", async 
 }) => {
   await page.goto("/");
   const main = page.locator("main");
+  await page.getByLabel("Hex color value").fill("#2563EB");
 
   await expect(main).toHaveCSS("background-color", "rgb(37, 99, 235)");
   await page.getByRole("button", { name: "Switch to match" }).click();
@@ -133,6 +120,7 @@ test("keeps the match area stable when switching to an exact named-color match",
   page,
 }) => {
   await page.goto("/");
+  await page.getByLabel("Hex color value").fill("#2563EB");
   const match = page.getByRole("region", { name: "Named-color match" });
   const unmatchedHeight = await match.evaluate(
     (element) => element.clientHeight,
@@ -145,7 +133,7 @@ test("keeps the match area stable when switching to an exact named-color match",
   await expect(match).toHaveJSProperty("clientHeight", unmatchedHeight);
 });
 
-test("retains the stable initial color and explains the JavaScript requirement without JavaScript", async ({
+test("renders a random named color before JavaScript runs", async ({
   browser,
 }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
@@ -158,6 +146,6 @@ test("retains the stable initial color and explains the JavaScript requirement w
   expect(noScriptMarkup).toContain(
     "Interactive color identification requires JavaScript.",
   );
-  await expect(page.getByLabel("Hex color value")).toHaveValue("#2563EB");
+  await expect(page.getByLabel("Hex color value")).not.toHaveValue("#2563EB");
   await context.close();
 });

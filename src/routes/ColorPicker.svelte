@@ -1,21 +1,13 @@
 <script lang="ts">
-  import { ColorPicker, parseColor } from "@ark-ui/svelte/color-picker";
+import { ColorPicker, parseColor } from "@ark-ui/svelte/color-picker";
 
-  let { value, oninput }: { value: string; oninput: (value: string) => void } =
-    $props();
+import { namedColorCatalog } from "$lib/color/catalog";
+import { namedColorSwatches } from "$lib/color/color";
 
-  const savedColors = [
-    "#EF4444",
-    "#F59E0B",
-    "#EAB308",
-    "#22C55E",
-    "#14B8A6",
-    "#06B6D4",
-    "#3B82F6",
-    "#8B5CF6",
-    "#D946EF",
-    "#EC4899",
-  ];
+let { value, oninput }: { value: string; oninput: (value: string) => void } =
+  $props();
+
+const savedColors = namedColorSwatches(namedColorCatalog);
 </script>
 
 <ColorPicker.Root
@@ -81,14 +73,14 @@
           Saved colors
         </p>
         <ColorPicker.SwatchGroup class="grid grid-cols-10 gap-1.5">
-          {#each savedColors as savedColor (savedColor)}
+          {#each savedColors as savedColor (savedColor.hex)}
             <ColorPicker.SwatchTrigger
-              value={savedColor}
+              value={savedColor.hex}
               class="group/swatch relative aspect-square rounded-full outline-none transition hover:scale-110 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]"
-              aria-label={`Choose ${savedColor}`}
+              aria-label={`Choose ${savedColor.name} (${savedColor.hex})`}
             >
               <ColorPicker.Swatch
-                value={savedColor}
+                value={savedColor.hex}
                 class="block h-full w-full rounded-full border border-white/25 shadow-[0_1px_2px_rgb(0_0_0_/_0.3)]"
               >
                 <ColorPicker.SwatchIndicator class="absolute inset-0 grid place-items-center text-[0.65rem] font-bold text-white drop-shadow-[0_1px_1px_rgb(0_0_0_/_0.8)]">

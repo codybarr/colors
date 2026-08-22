@@ -5,8 +5,10 @@ import {
   formatOklch,
   formatRgb,
   hexToOklab,
+  namedColorSwatches,
   type NamedColor,
   parseHex,
+  randomNamedColor,
 } from "./color";
 
 const catalog: NamedColor[] = [
@@ -38,6 +40,17 @@ describe("selected-color utilities", () => {
   it("formats an sRGB color as RGB text and retains it when OKLCH is unavailable", () => {
     expect(formatRgb("#2563EB")).toBe("rgb(37 99 235)");
     expect(formatOklch("#2563EB", false)).toBeNull();
+  });
+
+  it("selects a random catalog color and clamps an out-of-range random value", () => {
+    expect(randomNamedColor(catalog, () => 0).name).toBe("Beta");
+    expect(randomNamedColor(catalog, () => 1).name).toBe("Near black");
+  });
+
+  it("chooses distinct named swatches across the catalog", () => {
+    const swatches = namedColorSwatches(catalog);
+    expect(swatches).toHaveLength(catalog.length);
+    expect(new Set(swatches).size).toBe(catalog.length);
   });
 
   it("prefers an exact named-color match over its OKLab distance", () => {

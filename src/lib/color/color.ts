@@ -160,6 +160,52 @@ function distance(left: Oklab, right: Oklab): number {
   return Math.hypot(left[0] - right[0], left[1] - right[1], left[2] - right[2]);
 }
 
+export function randomNamedColor(
+  catalog: readonly NamedColor[],
+  random = Math.random,
+): NamedColor {
+  if (catalog.length === 0)
+    throw new RangeError("The named-color catalog cannot be empty");
+
+  return catalog[
+    Math.min(catalog.length - 1, Math.floor(random() * catalog.length))
+  ];
+}
+
+/** Returns distinct catalog colors spread across lightness and hue. */
+export function namedColorSwatches(
+  catalog: readonly NamedColor[],
+): NamedColor[] {
+  if (catalog.length === 0)
+    throw new RangeError("The named-color catalog cannot be empty");
+
+  const targets: Oklab[] = [
+    [0.55, 0.18, 0.06],
+    [0.72, 0.1, 0.14],
+    [0.88, -0.04, 0.16],
+    [0.62, -0.16, 0.1],
+    [0.68, -0.12, -0.08],
+    [0.48, -0.06, -0.16],
+    [0.57, 0.08, -0.16],
+    [0.5, 0.17, -0.06],
+    [0.82, 0.03, 0.04],
+    [0.26, 0, 0],
+  ];
+  const selected = new Set<NamedColor>();
+
+  return targets.slice(0, catalog.length).map((target) => {
+    const swatch = catalog
+      .filter((color) => !selected.has(color))
+      .reduce((best, candidate) =>
+        distance(target, candidate.oklab) < distance(target, best.oklab)
+          ? candidate
+          : best,
+      );
+    selected.add(swatch);
+    return swatch;
+  });
+}
+
 export function findNamedColorMatch(
   value: string,
   catalog: readonly NamedColor[],
