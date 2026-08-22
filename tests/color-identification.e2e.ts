@@ -114,6 +114,17 @@ test("switches the selected color to the named-color match and announces it", as
 	await expect(page.getByText("Exact named-color match")).toBeVisible();
 });
 
+test("keeps an opaque selected-color background during the match switch", async ({
+	page,
+}) => {
+	await page.goto("/");
+	const main = page.locator("main");
+
+	await expect(main).toHaveCSS("background-color", "rgb(37, 99, 235)");
+	await page.getByRole("button", { name: "Switch to match" }).click();
+	await expect(main).toHaveCSS("background-color", "rgb(0, 102, 238)");
+});
+
 test("keeps the match area stable when switching to an exact named-color match", async ({
 	page,
 }) => {
