@@ -16,7 +16,6 @@
   } = $props();
   let hexValue = $derived(hex);
   let rgbValue = $derived(rgb);
-  let oklchValue = $derived(oklch ?? "");
   let copied = $state<string | null>(null);
 
   function updateColor(value: string) {
@@ -32,11 +31,6 @@
   function updateRgb(event: Event) {
     rgbValue = (event.currentTarget as HTMLInputElement).value;
     updateColor(rgbValue);
-  }
-
-  function updateOklch(event: Event) {
-    oklchValue = (event.currentTarget as HTMLInputElement).value;
-    updateColor(oklchValue);
   }
 
   async function copyValue(label: string, value: string) {
@@ -57,7 +51,10 @@
   aria-label="Color representations"
 >
   <div class="grid gap-1">
-    <label class="text-[0.7rem] font-bold tracking-[0.08em] uppercase" for="hex-color-value">Hex</label>
+    <label
+      class="text-[0.7rem] font-bold tracking-[0.08em] uppercase"
+      for="hex-color-value">Hex</label
+    >
     <div class="flex items-center border-b border-current">
       <input
         class="w-[7ch] min-w-0 rounded-none border-0 bg-transparent py-1 font-inherit text-inherit focus-visible:outline-3 focus-visible:outline-current focus-visible:outline-offset-4"
@@ -82,7 +79,10 @@
   </div>
 
   <div class="grid gap-1">
-    <label class="text-[0.7rem] font-bold tracking-[0.08em] uppercase" for="rgb-color-value">RGB</label>
+    <label
+      class="text-[0.7rem] font-bold tracking-[0.08em] uppercase"
+      for="rgb-color-value">RGB</label
+    >
     <div class="flex items-center border-b border-current">
       <input
         class="w-[16ch] min-w-0 rounded-none border-0 bg-transparent py-1 font-inherit text-inherit focus-visible:outline-3 focus-visible:outline-current focus-visible:outline-offset-4"
@@ -105,33 +105,6 @@
       </button>
     </div>
   </div>
-
-  {#if oklch}
-    <div class="grid gap-1">
-      <label class="text-[0.7rem] font-bold tracking-[0.08em] uppercase" for="oklch-color-value">OKLCH</label>
-      <div class="flex items-center border-b border-current">
-        <input
-          class="w-[28ch] min-w-0 rounded-none border-0 bg-transparent py-1 font-inherit text-inherit focus-visible:outline-3 focus-visible:outline-current focus-visible:outline-offset-4"
-          id="oklch-color-value"
-          aria-label="OKLCH color value"
-          value={oklchValue}
-          oninput={updateOklch}
-        />
-        <button
-          class="grid cursor-pointer border-0 bg-transparent py-[0.2rem] pr-0 pl-[0.4rem] text-inherit focus-visible:outline-3 focus-visible:outline-current focus-visible:outline-offset-4"
-          type="button"
-          aria-label="Copy OKLCH value"
-          onclick={() => copyValue("OKLCH", oklchValue)}
-        >
-          {#if copied === "OKLCH"}
-            <IconCheck aria-hidden="true" size={16} stroke={2} />
-          {:else}
-            <IconCopy aria-hidden="true" size={16} stroke={2} />
-          {/if}
-        </button>
-      </div>
-    </div>
-  {/if}
 </section>
 
 <p class="sr-only" aria-atomic="true" aria-live="polite">
