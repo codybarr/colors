@@ -5,7 +5,7 @@ test("selects a random named color on load", async ({ page }) => {
   await expect(page.locator('main[data-hydrated="true"]')).toBeVisible();
 
   const selectedHex = await page.getByLabel("Hex color value").inputValue();
-  expect(selectedHex).toMatch(/^#[0-9A-F]{6}$/);
+  expect(selectedHex).toMatch(/^[0-9A-F]{6}$/);
   await expect(page.locator("main")).toHaveCSS("background-image", "none");
 });
 
@@ -14,32 +14,48 @@ test("updates the selected color representations from the native picker", async 
 }) => {
   await page.goto("/");
   await expect(page.locator('main[data-hydrated="true"]')).toBeVisible();
-  await page.getByLabel("Hex color value").fill("#ff0000");
+  await page.getByLabel("Hex color value").fill("ff0000");
 
-  await expect(page.getByLabel("Hex color value")).toHaveValue("#FF0000");
-  await expect(page.getByLabel("RGB color value")).toHaveValue("rgb(255 0 0)");
+  await expect(page.getByLabel("Hex color value")).toHaveValue("FF0000");
+  await expect(page.getByLabel("Red channel")).toHaveValue("255");
+  await expect(page.getByLabel("Green channel")).toHaveValue("0");
+  await expect(page.getByLabel("Blue channel")).toHaveValue("0");
   await expect(page.locator("main")).toHaveCSS(
     "background-color",
     "rgb(255, 0, 0)",
   );
 });
 
-test("updates the selected color and match from RGB and OKLCH representation inputs", async ({
+test("updates the selected color from validated RGB channels", async ({
   page,
 }) => {
   await page.goto("/");
-  const rgb = page.getByLabel("RGB color value");
-  await rgb.fill("rgb(36 100 235)");
+  await page.getByLabel("Red channel").fill("36");
+  await page.getByLabel("Green channel").fill("100");
+  await page.getByLabel("Blue channel").fill("235");
 
-  await expect(page.getByLabel("Hex color value")).toHaveValue("#2464EB");
-  await expect(rgb).toHaveValue("rgb(36 100 235)");
+  await expect(page.getByLabel("Hex color value")).toHaveValue("2464EB");
   await expect(page.locator("main")).toHaveCSS(
     "background-image",
     /linear-gradient\(/,
   );
+});
 
-  await page.getByLabel("OKLCH color value").fill("oklch(62.8% 0.2577 29.23)");
-  await expect(page.getByLabel("Hex color value")).toHaveValue("#FF0000");
+test("keeps the hex prefix fixed and rejects out-of-range RGB channels", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const hex = page.getByLabel("Hex color value");
+  await hex.fill("#ff0000z");
+  await expect(hex).toHaveValue("FF0000");
+
+  const red = page.getByLabel("Red channel");
+  const priorHex = await hex.inputValue();
+  await red.fill("256");
+  await expect(red).toHaveAttribute("aria-invalid", "true");
+  await expect(hex).toHaveValue(priorHex);
+  await red.blur();
+  await expect(red).toHaveAttribute("aria-invalid", "false");
 });
 
 test("copies a color representation", async ({ page }) => {
@@ -54,13 +70,13 @@ test("copies a color representation", async ({ page }) => {
   );
   await expect(
     page.evaluate(() => navigator.clipboard.readText()),
-  ).resolves.toBe(selectedHex);
+  ).resolves.toBe(`#${selectedHex}`);
 });
 
 test("uses a black foreground for a light selected color", async ({ page }) => {
   await page.goto("/");
   const selectedColorValue = page.getByLabel("Hex color value");
-  await selectedColorValue.fill("#FFFFFF");
+  await selectedColorValue.fill("FFFFFF");
 
   await expect(page.locator("main")).toHaveCSS("color", "rgb(0, 0, 0)");
   await expect(page.getByLabel("Hex color value")).toHaveCSS(
@@ -68,7 +84,7 @@ test("uses a black foreground for a light selected color", async ({ page }) => {
     "rgb(0, 0, 0)",
   );
 
-  await selectedColorValue.fill("#000000");
+  await selectedColorValue.fill("000000");
   await expect(page.locator("main")).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(page.getByLabel("Hex color value")).toHaveCSS(
     "color",
@@ -87,7 +103,7 @@ test("switches the selected color to the named-color match and announces it", as
   ).toBeFocused();
 
   await page.getByRole("button", { name: "Switch to match" }).press("Enter");
-  await expect(page.getByLabel("Hex color value")).toHaveValue("#0066EE");
+  await expect(page.getByLabel("Hex color value")).toHaveValue("0066EE");
   await expect(
     page.getByText("Named-color match", { exact: true }),
   ).toBeVisible();
