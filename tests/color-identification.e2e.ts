@@ -17,7 +17,10 @@ test("shows the deterministic selected color and its named-color match", async (
     "2px",
   );
   await expect(page.getByText("Epic Blue", { exact: true })).toBeVisible();
-  await expect(page.locator("main")).not.toHaveClass(/exact-match/);
+  await expect(page.locator("main")).toHaveCSS(
+    "background-image",
+    /linear-gradient\(/,
+  );
 });
 
 test("updates the selected color representations from the native picker", async ({
@@ -29,9 +32,9 @@ test("updates the selected color representations from the native picker", async 
 
   await expect(page.getByLabel("Hex color value")).toHaveValue("#FF0000");
   await expect(page.getByLabel("RGB color value")).toHaveValue("rgb(255 0 0)");
-  await expect(page.locator("main")).toHaveAttribute(
-    "style",
-    /--selected-color: #FF0000/,
+  await expect(page.locator("main")).toHaveCSS(
+    "background-color",
+    "rgb(255, 0, 0)",
   );
 });
 
@@ -44,7 +47,6 @@ test("updates the selected color and match from RGB and OKLCH representation inp
 
   await expect(page.getByLabel("Hex color value")).toHaveValue("#2464EB");
   await expect(rgb).toHaveValue("rgb(36 100 235)");
-  await expect(page.locator("main")).not.toHaveClass(/exact-match/);
   await expect(page.locator("main")).toHaveCSS(
     "background-image",
     /linear-gradient\(/,
@@ -59,7 +61,7 @@ test("copies a color representation", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Copy hex value" }).click();
 
-  await expect(page.locator(".copy-announcement")).toHaveText(
+  await expect(page.getByText("Hex value copied.")).toHaveText(
     "Hex value copied.",
   );
   await expect(
@@ -69,7 +71,9 @@ test("copies a color representation", async ({ page }) => {
 
 test("uses a black foreground for a light selected color", async ({ page }) => {
   await page.goto("/");
-  const selectedColorValue = page.getByLabel("Selected color value");
+  const selectedColorValue = page.getByLabel("Selected color", {
+    exact: true,
+  });
   await selectedColorValue.fill("#FFFFFF");
 
   await expect(selectedColorValue).toHaveCSS("color", "rgb(0, 0, 0)");
@@ -99,15 +103,19 @@ test("switches the selected color to the named-color match and announces it", as
   await expect(page.getByLabel("Selected color", { exact: true })).toHaveValue(
     "#0066ee",
   );
-  await expect(page.getByText("Exact named-color match")).toBeVisible();
-  await expect(page.locator("main")).toHaveClass(/exact-match/);
-  await expect(page.locator(".match-announcement")).toContainText(
-    "Epic Blue, #0066EE",
-  );
+  await expect(
+    page.getByText("Named-color match", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("main")).toHaveCSS("background-image", "none");
+  await expect(
+    page.getByText("Named-color match: Epic Blue, #0066EE."),
+  ).toBeVisible();
 
   await page.goto("/");
   await page.getByRole("button", { name: "Switch to match" }).click();
-  await expect(page.getByText("Exact named-color match")).toBeVisible();
+  await expect(
+    page.getByText("Named-color match", { exact: true }),
+  ).toBeVisible();
 });
 
 test("keeps an opaque selected-color background during the match switch", async ({
@@ -125,13 +133,15 @@ test("keeps the match area stable when switching to an exact named-color match",
   page,
 }) => {
   await page.goto("/");
-  const match = page.locator(".match");
+  const match = page.getByRole("region", { name: "Named-color match" });
   const unmatchedHeight = await match.evaluate(
     (element) => element.clientHeight,
   );
 
   await page.getByRole("button", { name: "Switch to match" }).click();
-  await expect(page.getByText("Exact named-color match")).toBeVisible();
+  await expect(
+    page.getByText("Named-color match", { exact: true }),
+  ).toBeVisible();
   await expect(match).toHaveJSProperty("clientHeight", unmatchedHeight);
 });
 

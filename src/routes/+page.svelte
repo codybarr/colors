@@ -47,10 +47,9 @@
 </svelte:head>
 
 <main
-  class:exact-match={isExactMatch}
-  class="color-identification"
+  class="grid min-h-svh min-w-80 grid-cols-[min(100%,42rem)] content-center justify-center p-3 font-['DM_Mono',ui-monospace,monospace] motion-safe:transition-[background-color] motion-safe:duration-120 motion-safe:ease-linear sm:p-6"
   data-hydrated={isHydrated}
-  style={`--selected-color: ${selectedColor}; --matched-color: ${namedColorMatch.hex}; --foreground-color: ${foregroundColor};`}
+  style={`background-color: ${selectedColor}; background-image: ${isExactMatch ? "none" : `linear-gradient(180deg, ${selectedColor} 0 50%, ${namedColorMatch.hex} 50% 100%)`}; color: ${foregroundColor};`}
 >
   <ColorPicker value={selectedColor} oninput={selectColor} />
   <NamedColorMatch
@@ -65,13 +64,13 @@
     oklch={selectedColorOklch}
     oninput={selectColor}
   />
-  <p class="match-announcement" aria-atomic="true" aria-live="polite">
+  <p class="sr-only" aria-atomic="true" aria-live="polite">
     Named-color match: {namedColorMatch.name}, {namedColorMatch.hex}.
   </p>
 </main>
 
 <noscript>
-  <p class="no-script-message">
+  <p class="fixed bottom-4 left-4 m-0 max-w-120 bg-black px-4 py-3 text-white">
     Interactive color identification requires JavaScript. The initial selected
     color is #2563EB.
   </p>
