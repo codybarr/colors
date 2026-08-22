@@ -1,15 +1,15 @@
 <script lang="ts">
-    let {
-        name,
-        hex,
-        isExactMatch,
-        onswitch,
-    }: {
-        name: string;
-        hex: string;
-        isExactMatch: boolean;
-        onswitch: () => void;
-    } = $props();
+let {
+  name,
+  hex,
+  isExactMatch,
+  onswitch,
+}: {
+  name: string;
+  hex: string;
+  isExactMatch: boolean;
+  onswitch: () => void;
+} = $props();
 </script>
 
 <section class="match" aria-labelledby="named-match-heading">

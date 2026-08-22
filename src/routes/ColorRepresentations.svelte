@@ -1,55 +1,55 @@
 <script lang="ts">
-	import { IconCheck, IconCopy } from "@tabler/icons-svelte";
+import { IconCheck, IconCopy } from "@tabler/icons-svelte";
 
-	import { parseCssColor } from "$lib/color/color";
+import { parseCssColor } from "$lib/color/color";
 
-	let {
-		hex,
-		rgb,
-		oklch,
-		oninput,
-	}: {
-		hex: string;
-		rgb: string;
-		oklch: string | null;
-		oninput: (value: string) => void;
-	} = $props();
-	let hexValue = $derived(hex);
-	let rgbValue = $derived(rgb);
-	let oklchValue = $derived(oklch ?? "");
-	let copied = $state<string | null>(null);
+let {
+  hex,
+  rgb,
+  oklch,
+  oninput,
+}: {
+  hex: string;
+  rgb: string;
+  oklch: string | null;
+  oninput: (value: string) => void;
+} = $props();
+let hexValue = $derived(hex);
+let rgbValue = $derived(rgb);
+let oklchValue = $derived(oklch ?? "");
+let copied = $state<string | null>(null);
 
-	function updateColor(value: string) {
-		const color = parseCssColor(value);
-		if (color) oninput(color.hex);
-	}
+function updateColor(value: string) {
+  const color = parseCssColor(value);
+  if (color) oninput(color.hex);
+}
 
-	function updateHex(event: Event) {
-		hexValue = (event.currentTarget as HTMLInputElement).value;
-		updateColor(hexValue);
-	}
+function updateHex(event: Event) {
+  hexValue = (event.currentTarget as HTMLInputElement).value;
+  updateColor(hexValue);
+}
 
-	function updateRgb(event: Event) {
-		rgbValue = (event.currentTarget as HTMLInputElement).value;
-		updateColor(rgbValue);
-	}
+function updateRgb(event: Event) {
+  rgbValue = (event.currentTarget as HTMLInputElement).value;
+  updateColor(rgbValue);
+}
 
-	function updateOklch(event: Event) {
-		oklchValue = (event.currentTarget as HTMLInputElement).value;
-		updateColor(oklchValue);
-	}
+function updateOklch(event: Event) {
+  oklchValue = (event.currentTarget as HTMLInputElement).value;
+  updateColor(oklchValue);
+}
 
-	async function copyValue(label: string, value: string) {
-		try {
-			await navigator.clipboard.writeText(value);
-			copied = label;
-			window.setTimeout(() => {
-				if (copied === label) copied = null;
-			}, 1600);
-		} catch {
-			// Clipboard access may be unavailable outside a secure browser context.
-		}
-	}
+async function copyValue(label: string, value: string) {
+  try {
+    await navigator.clipboard.writeText(value);
+    copied = label;
+    window.setTimeout(() => {
+      if (copied === label) copied = null;
+    }, 1600);
+  } catch {
+    // Clipboard access may be unavailable outside a secure browser context.
+  }
+}
 </script>
 
 <section class="representations" aria-label="Color representations">
