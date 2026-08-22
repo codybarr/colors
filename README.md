@@ -1,42 +1,64 @@
-# sv
+# colors
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A small, single-page web app for identifying the closest named color to an sRGB color.
 
-## Creating a project
+Choose a color with the native picker or edit a color value directly. The app displays the selected color alongside its closest named-color match, then lets you switch to that match.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- Accepts `#RRGGBB`, `rgb(...)`, and (where supported) `oklch(...)` color values
+- Shows HEX, RGB, and browser-supported OKLCH representations
+- Copies each representation to the clipboard
+- Matches against the [`color-name-list`](https://github.com/meodai/color-names) **Best Of** catalog
+- Prefers exact catalog matches; otherwise compares colors by Euclidean distance in OKLab
+- Uses a contrasting foreground color and keyboard-visible focus states
 
-To recreate this project with the same configuration:
+## Stack
 
-```sh
-# recreate this project
-bun x sv@0.17.0 create --template minimal --types ts --add tailwindcss="plugins:none" --install bun colors
-```
+- SvelteKit and Svelte 5
+- TypeScript
+- Tailwind CSS 4
+- Ark UI Svelte
+- Bun
 
-## Developing
+## Getting started
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
+Install dependencies and start the development server:
 
 ```sh
-npm run build
+bun install
+bun run dev
 ```
 
-You can preview the production build with `npm run preview`.
+Create a production build and preview it locally:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+bun run build
+bun run preview
+```
+
+## Quality checks
+
+```sh
+# Type-check Svelte and TypeScript
+bun run check
+
+# Run unit tests
+bun run test:unit
+
+# Run Playwright end-to-end tests
+bun run test:e2e
+
+# Run all tests
+bun run test
+```
+
+## Updating the named-color catalog
+
+The generated catalog lives at `src/lib/color/catalog.ts`. Regenerate it after updating `color-name-list`:
+
+```sh
+bun run generate:catalog
+```
+
+The catalog is derived from `color-name-list`'s Best Of subset. Its license is included at `src/lib/color/LICENSE-color-name-list.txt`.
