@@ -37,6 +37,22 @@ bun run build
 bun run preview
 ```
 
+## Cloudflare Workers
+
+The app uses the Cloudflare adapter and `wrangler.jsonc` to deploy to the `colors` Worker.
+Configure the connected repository in Cloudflare with:
+
+- **Build command:** `bun run build`
+- **Deploy command:** `bunx wrangler deploy`
+- **Root directory:** repository root
+
+Validate the deployment bundle locally without publishing:
+
+```sh
+bun run build
+bunx wrangler deploy --dry-run
+```
+
 ## Quality checks
 
 ```sh
