@@ -20,7 +20,7 @@
     Named-color match
   </p>
   <p
-    class="my-[0.45rem] break-words text-[clamp(1.8rem,7vw,4.5rem)] font-bold leading-[0.96] tracking-[-0.08em]"
+    class="my-[0.45rem] whitespace-nowrap text-[clamp(1.8rem,7vw,4.5rem)] font-bold leading-[0.96] tracking-[-0.08em]"
   >
     {name}
   </p>
