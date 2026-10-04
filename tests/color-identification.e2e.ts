@@ -97,16 +97,14 @@ test("switches the selected color to the named-color match and announces it", as
 }) => {
   await page.goto("/");
   await page.getByLabel("Hex color value").fill("#2563EB");
-  await page.getByRole("button", { name: "Switch to match" }).focus();
+  await page.getByRole("button", { name: "Use named color" }).focus();
   await expect(
-    page.getByRole("button", { name: "Switch to match" }),
+    page.getByRole("button", { name: "Use named color" }),
   ).toBeFocused();
 
-  await page.getByRole("button", { name: "Switch to match" }).press("Enter");
+  await page.getByRole("button", { name: "Use named color" }).press("Enter");
   await expect(page.getByLabel("Hex color value")).toHaveValue("0066EE");
-  await expect(
-    page.getByText("Named-color match", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("Exact match", { exact: true })).toBeVisible();
   await expect(page.locator("main")).toHaveCSS("background-image", "none");
   await expect(
     page.getByText("Named-color match: Epic Blue, #0066EE."),
@@ -114,10 +112,8 @@ test("switches the selected color to the named-color match and announces it", as
 
   await page.goto("/");
   await page.getByLabel("Hex color value").fill("#2563EB");
-  await page.getByRole("button", { name: "Switch to match" }).click();
-  await expect(
-    page.getByText("Named-color match", { exact: true }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "Use named color" }).click();
+  await expect(page.getByText("Exact match", { exact: true })).toBeVisible();
 });
 
 test("keeps an opaque selected-color background during the match switch", async ({
@@ -128,7 +124,7 @@ test("keeps an opaque selected-color background during the match switch", async 
   await page.getByLabel("Hex color value").fill("#2563EB");
 
   await expect(main).toHaveCSS("background-color", "rgb(37, 99, 235)");
-  await page.getByRole("button", { name: "Switch to match" }).click();
+  await page.getByRole("button", { name: "Use named color" }).click();
   await expect(main).toHaveCSS("background-color", "rgb(0, 102, 238)");
 });
 
@@ -142,12 +138,53 @@ test("keeps the match area stable when switching to an exact named-color match",
     (element) => element.clientHeight,
   );
 
-  await page.getByRole("button", { name: "Switch to match" }).click();
-  await expect(
-    page.getByText("Named-color match", { exact: true }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "Use named color" }).click();
+  await expect(page.getByText("Exact match", { exact: true })).toBeVisible();
   await expect(match).toHaveJSProperty("clientHeight", unmatchedHeight);
 });
+
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 375, height: 812 },
+]) {
+  test(`labels and anchors each color half at ${viewport.width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    await page.getByLabel("Hex color value").fill("2563EB");
+
+    const selected = page.getByRole("region", { name: "Your color" });
+    const match = page.getByRole("region", { name: "Named-color match" });
+    await expect(selected.getByText("#2563EB", { exact: true })).toBeVisible();
+    await expect(
+      match.getByText("Closest named color", { exact: true }),
+    ).toBeVisible();
+    await expect(match.getByText("Epic Blue", { exact: true })).toBeVisible();
+    await expect(match.getByText("#0066EE", { exact: true })).toBeVisible();
+
+    const mainBox = await page.locator("main").boundingBox();
+    const selectedBox = await selected.boundingBox();
+    const matchBox = await match.boundingBox();
+    expect(mainBox).not.toBeNull();
+    expect(selectedBox!.y + selectedBox!.height).toBeLessThanOrEqual(
+      mainBox!.y + mainBox!.height / 2 + 1,
+    );
+    expect(matchBox!.y).toBeGreaterThanOrEqual(
+      mainBox!.y + mainBox!.height / 2,
+    );
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBe(viewport.width);
+
+    await page.getByRole("button", { name: "Use named color" }).click();
+    await expect(match.getByText("Exact match", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Use named color" }),
+    ).toBeHidden();
+    await expect(selected.getByText("#0066EE", { exact: true })).toBeVisible();
+  });
+}
 
 test("renders a random named color before JavaScript runs", async ({
   browser,

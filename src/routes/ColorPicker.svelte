@@ -2,12 +2,16 @@
 import { ColorPicker, parseColor } from "@ark-ui/svelte/color-picker";
 
 import { namedColorCatalog } from "$lib/color/catalog";
-import { namedColorSwatches } from "$lib/color/color";
+import { namedColorSwatches, type NamedColor } from "$lib/color/color";
+import { colorFamilyLabel, identifyColorFamily } from "$lib/color/family";
 
 let { value, oninput }: { value: string; oninput: (value: string) => void } =
   $props();
 
 const savedColors = namedColorSwatches(namedColorCatalog);
+let hoveredSwatch = $state<NamedColor | null>(null);
+let focusedSwatch = $state<NamedColor | null>(null);
+let inspectedSwatch = $derived(hoveredSwatch ?? focusedSwatch);
 </script>
 
 <ColorPicker.Root
@@ -36,7 +40,7 @@ const savedColors = namedColorSwatches(namedColorCatalog);
 
   <ColorPicker.Positioner>
     <ColorPicker.Content
-      class="color-picker-panel w-[min(calc(100vw-1.5rem),22rem)] rounded-[1.35rem] border border-white/15 bg-[#141414]/95 p-3.5 text-[#f5f2ed] shadow-[0_24px_60px_rgb(0_0_0_/_0.42),0_1px_0_rgb(255_255_255_/_0.12)_inset] backdrop-blur-xl data-[state=closed]:animate-none"
+      class="color-picker-panel z-50 w-[min(calc(100vw-1.5rem),22rem)] rounded-[1.35rem] border border-white/15 bg-[#141414]/95 p-3.5 text-[#f5f2ed] shadow-[0_24px_60px_rgb(0_0_0_/_0.42)] backdrop-blur-xl data-[state=closed]:animate-none"
     >
       <div class="mb-3 flex items-center justify-between px-1">
         <span class="text-[0.65rem] font-bold tracking-[0.16em] text-white/55 uppercase">
@@ -53,8 +57,8 @@ const savedColors = namedColorSwatches(namedColorCatalog);
       <div class="mt-4 space-y-3">
         <div class="flex items-center gap-3">
           <span class="w-8 text-[0.65rem] font-bold tracking-[0.12em] text-white/55 uppercase">Hue</span>
-          <ColorPicker.ChannelSlider channel="hue" class="relative h-4 flex-1 cursor-ew-resize">
-            <ColorPicker.ChannelSliderTrack class="h-2 rounded-full shadow-[0_0_0_1px_rgb(255_255_255_/_0.14)]" />
+          <ColorPicker.ChannelSlider channel="hue" class="relative flex h-4 flex-1 cursor-ew-resize items-center">
+            <ColorPicker.ChannelSliderTrack class="h-2 w-full rounded-full shadow-[0_0_0_1px_rgb(255_255_255_/_0.14)]" />
             <ColorPicker.ChannelSliderThumb class="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-white bg-transparent shadow-[0_0_0_2px_rgb(0_0_0_/_0.55)]" />
           </ColorPicker.ChannelSlider>
         </div>
@@ -77,7 +81,11 @@ const savedColors = namedColorSwatches(namedColorCatalog);
             <ColorPicker.SwatchTrigger
               value={savedColor.hex}
               class="group/swatch relative aspect-square rounded-full outline-none transition hover:scale-110 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]"
-              aria-label={`Choose ${savedColor.name} (${savedColor.hex})`}
+              aria-label={`Choose ${savedColor.name} (${savedColor.hex}), ${colorFamilyLabel(identifyColorFamily(savedColor.hex))}`}
+              onpointerenter={() => hoveredSwatch = savedColor}
+              onpointerleave={() => hoveredSwatch = null}
+              onfocus={() => focusedSwatch = savedColor}
+              onblur={() => focusedSwatch = null}
             >
               <ColorPicker.Swatch
                 value={savedColor.hex}
@@ -90,6 +98,12 @@ const savedColors = namedColorSwatches(namedColorCatalog);
             </ColorPicker.SwatchTrigger>
           {/each}
         </ColorPicker.SwatchGroup>
+        <p class="mt-3 mb-0 min-h-10 text-xs leading-5 text-white" data-testid="saved-color-family">
+          {#if inspectedSwatch}
+            {inspectedSwatch.name}<br />
+            Color family: {colorFamilyLabel(identifyColorFamily(inspectedSwatch.hex))}
+          {/if}
+        </p>
       </div>
 
       <ColorPicker.HiddenInput />
